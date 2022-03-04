@@ -8,20 +8,20 @@ if [ -f "$GITHUB_WORKSPACE/$INPUT_CONFIG_PATH" ]; then
   CONFIG=" --config-path=$GITHUB_WORKSPACE/$INPUT_CONFIG_PATH"
 fi
 
-echo running gitleaks "$(gitleaks --version) with the following command👇"
+echo running gitleaks "with the following command👇"
 
 DONATE_MSG="👋 maintaining gitleaks takes a lot of work so consider sponsoring me or donating a little something\n\e[36mhttps://github.com/sponsors/zricethezav\n\e[36mhttps://www.paypal.me/zricethezav\n"
 
 if [ "$GITHUB_EVENT_NAME" = "push" ]
 then
-  git --git-dir="$GITHUB_WORKSPACE/.git" log --left-right --cherry-pick --pretty=format:"%H" remotes/origin/master... > commit_list.txt
+  log_opts="remotes/origin/master..HEAD"
 elif [ "$GITHUB_EVENT_NAME" = "pull_request" ]
 then
-  git --git-dir="$GITHUB_WORKSPACE/.git" log --left-right --cherry-pick --pretty=format:"%H" remotes/origin/$GITHUB_BASE_REF... > commit_list.txt
+  log_opts="remotes/origin/$GITHUB_BASE_REF..HEAD"
 fi
 
-echo gitleaks --path=$GITHUB_WORKSPACE --verbose --redact --commits-file=commit_list.txt $CONFIG
-CAPTURE_OUTPUT=$(gitleaks --path=$GITHUB_WORKSPACE --verbose --redact --commits-file=commit_list.txt $CONFIG)
+echo gitleaks --source=$GITHUB_WORKSPACE --verbose --redact --log-opts="$log_opts" $CONFIG
+CAPTURE_OUTPUT=$(gitleaks --source=$GITHUB_WORKSPACE --verbose --redact --log-opts="remotes/origin/$GITHUB_BASE_REF..HEAD" $CONFIG)
 
 if [ $? -eq 1 ]
 then
