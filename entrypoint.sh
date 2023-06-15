@@ -20,8 +20,6 @@ then
   log_opts="remotes/origin/$GITHUB_BASE_REF..HEAD"
 fi
 
-git config --global --add safe.directory $GITHUB_WORKSPACE
-
 echo gitleaks detect --source=$GITHUB_WORKSPACE --verbose --redact --log-opts="$log_opts" $CONFIG
 CAPTURE_OUTPUT=$(gitleaks detect --source=$GITHUB_WORKSPACE --verbose --redact --log-opts="$log_opts" $CONFIG)
 
